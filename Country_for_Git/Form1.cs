@@ -37,5 +37,38 @@ namespace Country_for_Git
             //db.WorldParts.Add(part4);
             //}
         }
+
+        private void AddGroupClick(object sender, EventArgs e)
+        {
+            try
+            {
+                string groupname = textBoxWorldPart.Text.Trim();
+                if (groupname == "")
+                {
+                    MessageBox.Show("Не задано название части мира!");
+                    return;
+                }
+                using (var db = new WorldPartContext())
+                {
+                    var WorldPart = new WorldPart { Name = groupname };
+                    db.WorldParts.Add(WorldPart);
+                    db.SaveChanges();
+                    textBoxWorldPart.Text = "";
+
+                    var query = from b in db.WorldParts
+                                select b;
+                    comboBoxWorldPart.DataSource = query.ToList();
+                    comboBoxWorldPart.DisplayMember = "Name";
+
+                    MessageBox.Show("Часть мира добавлена!");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
     }
 }
