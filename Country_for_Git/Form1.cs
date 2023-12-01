@@ -69,6 +69,49 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+        private void RemoveGroupClick(object sender, EventArgs e)
+        {
+            if (comboBoxWorldPart.Items.Count == 0)
+                return;
+            try
+            {
+                using (var db = new WorldPartContext())
+                {
+                    List<WorldPart> list = comboBoxWorldPart.DataSource as List<WorldPart>;
+                    string WorldPart = list[comboBoxWorldPart.SelectedIndex].Name;
+                    var query = from b in db.WorldParts
+                                where b.Name == WorldPart
+                                select b;
+                    db.WorldParts.RemoveRange(query);
+                    db.SaveChanges();
+
+                    query = from b in db.WorldParts
+                            select b;
+                    comboBoxWorldPart.DataSource = query.ToList();
+                    comboBoxWorldPart.DisplayMember = "Name";
+
+                    var query2 = from b in db.Countries
+                                 select b;
+                    comboBoxCountry.DataSource = query2.ToList();
+                    comboBoxCountry.DisplayMember = "Name";
+
+                    if (comboBoxCountry.Items.Count == 0)
+                    {
+                        textBoxCapital.Text = "";
+                        textBoxName.Text = "";
+                        textBoxArea.Text = "";
+                        textBoxPopulation.Text = "";
+                        textBoxGr.Text = "";
+                    }
+
+                    MessageBox.Show("Часть мира удалена!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
     }
 }
