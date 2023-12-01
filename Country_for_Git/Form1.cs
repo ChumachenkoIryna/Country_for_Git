@@ -203,6 +203,44 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+        private void RemoveCountryClick(object sender, EventArgs e)
+        {
+            if (comboBoxCountry.Items.Count == 0)
+                return;
+            try
+            {
+                using (var db = new WorldPartContext())
+                {
+                    List<Country> list = comboBoxCountry.DataSource as List<Country>;
+                    string Country = list[comboBoxCountry.SelectedIndex].Name;
+                    var query = from b in db.Countries
+                                where b.Name == Country
+                                select b;
+                    db.Countries.RemoveRange(query);
+                    db.SaveChanges();
+
+                    var query2 = from b in db.Countries
+                                 select b;
+                    comboBoxCountry.DataSource = query2.ToList();
+                    comboBoxCountry.DisplayMember = "Name";
+
+                    if (comboBoxCountry.Items.Count == 0)
+                    {
+                        textBoxCapital.Text = "";
+                        textBoxName.Text = "";
+                        textBoxArea.Text = "";
+                        textBoxPopulation.Text = "";
+                        textBoxGr.Text = "";
+                    }
+
+                    MessageBox.Show("Страна удалена!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
 
     }
