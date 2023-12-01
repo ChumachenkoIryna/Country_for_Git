@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Country_for_Git
 {
-    internal class WorldPart
+    public class WorldPart
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public virtual ICollection<Country> Countries { get; set; }
     }
 }

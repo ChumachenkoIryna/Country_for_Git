@@ -112,6 +112,40 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+        private void EditGroupClick(object sender, EventArgs e)
+        {
+            try
+            {
+                string groupname = textBoxWorldPart.Text.Trim();
+                if (groupname == "")
+                {
+                    MessageBox.Show("Не задано название части мира!");
+                    return;
+                }
+                using (var db = new WorldPartContext())
+                {
+                    List<WorldPart> list = comboBoxWorldPart.DataSource as List<WorldPart>;
+                    string WorldPart = list[comboBoxWorldPart.SelectedIndex].Name;
+                    var query = (from b in db.WorldParts
+                                 where b.Name == WorldPart
+                                 select b).Single();
+                    query.Name = groupname;
+                    db.SaveChanges();
+                    textBoxWorldPart.Text = "";
+
+                    var query2 = from b in db.WorldParts
+                                 select b;
+                    comboBoxWorldPart.DataSource = query2.ToList();
+                    comboBoxWorldPart.DisplayMember = "Name";
+
+                    MessageBox.Show("Часть мира переименована!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
     }
 }

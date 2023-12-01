@@ -1,12 +1,23 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Country_for_Git
 {
-    internal class WorldPartContext
+    public class WorldPartContext : DbContext
     {
+        public WorldPartContext()
+        {
+            Database.EnsureCreated();
+        }
+
+        public DbSet<WorldPart> WorldParts { get; set; }
+        public DbSet<Country> Countries { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // метод UseLazyLoadingProxies() делает доступной ленивую загрузку.
+            optionsBuilder.UseLazyLoadingProxies().UseSqlServer(@"Server=IRISKA-PC;Database=CountryDB;Integrated Security=SSPI;TrustServerCertificate=true");
+        }
     }
 }
