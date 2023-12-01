@@ -14,6 +14,6 @@ namespace Country_for_Git
         public int? Population { get; set; }
         public double? Area { get; set; }
 
-        
+        public virtual WorldPart WorldPart { get; set; }
     }
 }
