@@ -147,5 +147,63 @@ namespace Country_for_Git
             }
         }
 
+        private void AddCountryClick(object sender, EventArgs e)
+        {
+            try
+            {
+                string capital = textBoxCapital.Text.Trim();
+                string Name = textBoxName.Text.Trim();
+                if (capital == "" || Name == "")
+                {
+                    MessageBox.Show("Не указано имя страны!");
+                    return;
+                }
+                if (comboBoxWorldPart.Items.Count == 0)
+                {
+                    MessageBox.Show("Не создано ни одной части мира!");
+                    return;
+                }
+                double? area = null;
+                if (textBoxArea.Text != "")
+                    area = Convert.ToDouble(textBoxArea.Text);
+
+                int? population = null;
+                if (textBoxPopulation.Text != "")
+                    population = Convert.ToInt32(textBoxPopulation.Text);
+
+                using (var db = new WorldPartContext())
+                {
+                    List<WorldPart> list = comboBoxWorldPart.DataSource as List<WorldPart>;
+                    string WorldPart = list[comboBoxWorldPart.SelectedIndex].Name;
+                    var query = (from b in db.WorldParts
+                                 where b.Name == WorldPart
+                                 select b).Single();
+
+                    var Country = new Country
+                    {
+                        Capital = capital,
+                        Name = Name,
+                        Population = population,
+                        Area = area,
+                        WorldPart = query
+                    };
+                    db.Countries.Add(Country);
+                    db.SaveChanges();
+
+                    var query2 = from b in db.Countries
+                                 select b;
+                    comboBoxCountry.DataSource = query2.ToList();
+                    comboBoxCountry.DisplayMember = "Name";
+
+                    MessageBox.Show("Страна добавлена!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
     }
 }
