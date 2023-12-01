@@ -241,6 +241,34 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+        private void comboBoxCountry_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxCountry.Items.Count == 0)
+                return;
+            try
+            {
+                using (var db = new WorldPartContext())
+                {
+                    List<Country> Countrylist = comboBoxCountry.DataSource as List<Country>;
+                    if (Countrylist == null)
+                        return;
+                    string Country = Countrylist[comboBoxCountry.SelectedIndex].Name;
+                    var query = (from b in db.Countries
+                                 where b.Name == Country
+                                 select b).Single();
+
+                    textBoxCapital.Text = query.Capital;
+                    textBoxName.Text = query.Name;
+                    textBoxArea.Text = query.Area.ToString();
+                    textBoxPopulation.Text = query.Population.ToString();
+                    textBoxGr.Text = query.WorldPart.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
 
     }
