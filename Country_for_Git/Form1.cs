@@ -241,6 +241,21 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+        private void EditCountryClick(object sender, EventArgs e)
+        {
+            try
+            {
+                string capital = textBoxCapital.Text.Trim();
+                string Name = textBoxName.Text.Trim();
+                if (capital == "" || Name == "")
+                {
+                    MessageBox.Show("Не указано имя страны или столицы!");
+                    return;
+                }
+
+                double? area = null;
+                if (textBoxArea.Text != "")
+                    area = Convert.ToDouble(textBoxArea.Text);
         private void comboBoxCountry_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBoxCountry.Items.Count == 0)
@@ -270,6 +285,46 @@ namespace Country_for_Git
             }
         }
 
+                int? population = null;
+                if (textBoxPopulation.Text != "")
+                    population = Convert.ToInt32(textBoxPopulation.Text);
+
+                using (var db = new WorldPartContext())
+                {
+                    List<WorldPart> list = comboBoxWorldPart.DataSource as List<WorldPart>;
+                    string WorldPart = list[comboBoxWorldPart.SelectedIndex].Name;
+                    var query = (from b in db.WorldParts
+                                 where b.Name == WorldPart
+                                 select b).Single();
+                    if (query == null)
+                        return;
+
+                    List<Country> Countrylist = comboBoxCountry.DataSource as List<Country>;
+                    string Country = Countrylist[comboBoxCountry.SelectedIndex].Name;
+                    var query2 = (from b in db.Countries
+                                  where b.Name == Country
+                                  select b).Single();
+
+                    query2.WorldPart = query;
+                    query2.Capital = capital;
+                    query2.Name = Name;
+                    query2.Population = population;
+                    query2.Area = area;
+                    db.SaveChanges();
+
+                    var query3 = from b in db.Countries
+                                 select b;
+                    comboBoxCountry.DataSource = query3.ToList();
+                    comboBoxCountry.DisplayMember = "Name";
+
+                    MessageBox.Show("Данные о стране изменены!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
     }
 }
