@@ -1,3 +1,11 @@
+using Country_for_Git;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
+using System.Xml.Linq;
+
 namespace Country_for_Git
 {
     public partial class Form1 : Form
@@ -58,6 +66,7 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void RemoveGroupClick(object sender, EventArgs e)
         {
             if (comboBoxWorldPart.Items.Count == 0)
@@ -101,6 +110,7 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void EditGroupClick(object sender, EventArgs e)
         {
             try
@@ -192,6 +202,7 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void RemoveCountryClick(object sender, EventArgs e)
         {
             if (comboBoxCountry.Items.Count == 0)
@@ -230,6 +241,7 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void EditCountryClick(object sender, EventArgs e)
         {
             try
@@ -245,34 +257,6 @@ namespace Country_for_Git
                 double? area = null;
                 if (textBoxArea.Text != "")
                     area = Convert.ToDouble(textBoxArea.Text);
-        private void comboBoxCountry_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBoxCountry.Items.Count == 0)
-                return;
-            try
-            {
-                using (var db = new WorldPartContext())
-                {
-                    List<Country> Countrylist = comboBoxCountry.DataSource as List<Country>;
-                    if (Countrylist == null)
-                        return;
-                    string Country = Countrylist[comboBoxCountry.SelectedIndex].Name;
-                    var query = (from b in db.Countries
-                                 where b.Name == Country
-                                 select b).Single();
-
-                    textBoxCapital.Text = query.Capital;
-                    textBoxName.Text = query.Name;
-                    textBoxArea.Text = query.Area.ToString();
-                    textBoxPopulation.Text = query.Population.ToString();
-                    textBoxGr.Text = query.WorldPart.Name;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
 
                 int? population = null;
                 if (textBoxPopulation.Text != "")
@@ -315,5 +299,235 @@ namespace Country_for_Git
             }
         }
 
+        private void comboBoxCountry_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxCountry.Items.Count == 0)
+                return;
+            try
+            {
+                using (var db = new WorldPartContext())
+                {
+                    List<Country> Countrylist = comboBoxCountry.DataSource as List<Country>;
+                    if (Countrylist == null)
+                        return;
+                    string Country = Countrylist[comboBoxCountry.SelectedIndex].Name;
+                    var query = (from b in db.Countries
+                                 where b.Name == Country
+                                 select b).Single();
+
+                    textBoxCapital.Text = query.Capital;
+                    textBoxName.Text = query.Name;
+                    textBoxArea.Text = query.Area.ToString();
+                    textBoxPopulation.Text = query.Population.ToString();
+                    textBoxGr.Text = query.WorldPart.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void comboBoxWorldPart_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxWorldPart.Items.Count == 0)
+                return;
+            try
+            {
+                using (var db = new WorldPartContext())
+                {
+                    List<WorldPart> list = comboBoxWorldPart.DataSource as List<WorldPart>;
+                    string WorldPart = list[comboBoxWorldPart.SelectedIndex].Name;
+                    var query = (from b in db.WorldParts
+                                 where b.Name == WorldPart
+                                 select b).Single();
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            using (var db = new WorldPartContext())
+            {
+
+                var query = db.Countries.Join(
+     db.WorldParts,
+     (Country country) => country.WorldPart.Id,
+     (WorldPart part) => part.Id,
+     (country, part) => new
+     {
+         Name = country.Name,
+         Capital = country.Capital,
+         Population = country.Population,
+         Area = country.Area,
+         WorldPart = part.Name
+     });
+
+
+                dataGridView1.DataSource = query.ToList();
+            }
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+
+        {
+            if (numberText.Text.Length == 0)
+            {
+                MessageBox.Show("Задайте числo");
+                return;
+            }
+            using (var db = new WorldPartContext())
+            {
+                var query = db.Countries.Join(
+   db.WorldParts,
+   (Country country) => country.WorldPart.Id,
+   (WorldPart part) => part.Id,
+   (country, part) => new
+   {
+       Name = country.Name,
+       Capital = country.Capital,
+       Population = country.Population,
+       Area = country.Area,
+       WorldPart = part.Name
+   }).Where(l => l.Area > Double.Parse(numberText.Text)).Select(n => new { n.Name });
+                dataGridView1.DataSource = query.ToList();
+            }
+
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            using (var db = new WorldPartContext())
+            {
+                var names = db.Countries.Select(n => new { n.Name });
+                dataGridView1.DataSource = names.ToList();
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            using (var db = new WorldPartContext())
+            {
+                var capital = db.Countries.Select(n => new { n.Capital });
+                dataGridView1.DataSource = capital.ToList();
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            using (var db = new WorldPartContext())
+            {
+                var query = db.Countries.Join(
+   db.WorldParts,
+   (Country country) => country.WorldPart.Id,
+   (WorldPart part) => part.Id,
+   (country, part) => new
+   {
+       Name = country.Name,
+       Capital = country.Capital,
+       Population = country.Population,
+       Area = country.Area,
+       WorldPart = part.Name
+   }).Where(l => l.WorldPart.Equals("Европа")).Select(n => new { n.Name });
+                dataGridView1.DataSource = query.ToList();
+            }
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            using (var db = new WorldPartContext())
+            {
+                var query = db.Countries.Join(
+   db.WorldParts,
+   (Country country) => country.WorldPart.Id,
+   (WorldPart part) => part.Id,
+   (country, part) => new
+   {
+       Name = country.Name,
+       Capital = country.Capital,
+       Population = country.Population,
+       Area = country.Area,
+       WorldPart = part.Name
+   }).Where(l => l.Name.StartsWith("а")).Select(n => new { n.Name });
+                dataGridView1.DataSource = query.ToList();
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            using (var db = new WorldPartContext())
+            {
+                var query = db.Countries.Join(
+   db.WorldParts,
+   (Country country) => country.WorldPart.Id,
+   (WorldPart part) => part.Id,
+   (country, part) => new
+   {
+       Name = country.Name,
+       Capital = country.Capital,
+       Population = country.Population,
+       Area = country.Area,
+       WorldPart = part.Name
+   }).Where(l => l.Name.Contains("а") || l.Name.Contains("е")).Select(n => new { n.Name });
+                dataGridView1.DataSource = query.ToList();
+            }
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            if (minText.Text.Length == 0 || maxText.Text.Length == 0)
+            {
+                MessageBox.Show("Задайте диапазон");
+                return;
+            }
+            using (var db = new WorldPartContext())
+            {
+                var query = db.Countries.Join(
+   db.WorldParts,
+   (Country country) => country.WorldPart.Id,
+   (WorldPart part) => part.Id,
+   (country, part) => new
+   {
+       Name = country.Name,
+       Capital = country.Capital,
+       Population = country.Population,
+       Area = country.Area,
+       WorldPart = part.Name
+   }).Where(l => l.Area >= Double.Parse(minText.Text) && l.Area <= Double.Parse(maxText.Text));
+                dataGridView1.DataSource = query.ToList();
+            }
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            if (numberText.Text.Length == 0)
+            {
+                MessageBox.Show("Задайте числo");
+                return;
+            }
+            using (var db = new WorldPartContext())
+            {
+                var query = db.Countries.Join(
+   db.WorldParts,
+   (Country country) => country.WorldPart.Id,
+   (WorldPart part) => part.Id,
+   (country, part) => new
+   {
+       Name = country.Name,
+       Capital = country.Capital,
+       Population = country.Population,
+       Area = country.Area,
+       WorldPart = part.Name
+   }).Where(l => l.Population > Int32.Parse(numberText.Text));
+                dataGridView1.DataSource = query.ToList();
+            }
+
+        }
     }
 }
