@@ -25,17 +25,6 @@ namespace Country_for_Git
                 MessageBox.Show(ex.Message);
             }
 
-            //using(var db = new WorldPartContext())
-            //{
-            //WorldPart part1 = new WorldPart { Name = "Европа" };
-            //WorldPart part2 = new WorldPart { Name = "Азия" };
-            //WorldPart part3 = new WorldPart { Name = "Африка" };
-            //WorldPart part4 = new WorldPart { Name = "Европа" };
-            //db.WorldParts.Add(part1);
-            //db.WorldParts.Add(part2);
-            //db.WorldParts.Add(part3);
-            //db.WorldParts.Add(part4);
-            //}
         }
 
         private void AddGroupClick(object sender, EventArgs e)
